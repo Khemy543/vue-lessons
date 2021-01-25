@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Vue Instance</title>
+        <script src="https://unpkg.com/vue"></script>
+        <link rel='stylesheet' type="text/css" href="assets/styles/app.css" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js" integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ==" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+    </head>
+   
+    <body>
+        <div id="app">
+            <header class="navbar">
+                <div class="navbar-brand">
+                    <h1 v-text="sitename"></h1>
+                </div>
+                <div class="nav-item" style="margin-right: 20px;">
+                    <button class="btn btn-info" @click="showCheckout">
+                        <span>{{ cartItemCount }} | CheckOut</span>
+                    </button>
+                </div>
+            </header>
+            <main>
+                <div class="container">
+                    <div v-if='showProduct'>
+                    <div v-for="product in products">
+                    <div class="row">
+                        <div class="col-md-2 col-md-offset-1">
+                            <figure>
+                                <img v-bind:src="product.image" class="image"/>
+                            </figure>
+                        </div>
+                        <div class="col-md-6 col-md-offset-2 description">
+                            <h3 v-text="product.title"></h3>
+                            <p v-html="product.description"></p>
+                            <p>{{product.price | formatPrice}}</p>
+                            <div>
+                                <span v-for='n in 5' v-bind:class="{'active-rating': checkRating(n, product)}">*</span>
+                            </div>
+                            <button class="btn btn-primary" v-on:click='addToCart(product)' v-if='canAddToCart(product)'>
+                                Add To Cart
+                            </button>
+                            <button v-else class="btn btn-primary disabled">
+                                Add To Cart
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                    <div v-else>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="'row">
+                                    <div class="col-md-12">
+                                        <strong>First Name</strong>
+                                        <br/>
+                                        <input v-model.trim='order.firstname' />
+                                    </div>
+                                    <div class="col-md-12">
+                                        <strong>Last Name</strong>
+                                        <br/>
+                                        <input v-model.trim.lazy='order.lastname' />
+                                    </div>
+                                    <br/>
+                                    <div class="col-md-12">
+                                        <strong>Zip :</strong>
+                                        <br/>
+                                        <input type="number" v-model.number="order.zip" />
+                                    </div>
+                                    <br/>
+                                    <div class="col-md-12">
+                                        <select v-model="order.state">
+                                            <option disabled value="">State</option>
+                                            <option v-for = '(state,key) in states' v-bind:value="state">{{key}}</option>
+                                        </select>
+                                    </div>
+                                    <br/>
+                                    <div class="col-md-12">
+                                        <input 
+                                            id='gift'
+                                            type="checkbox"
+                                            value="true"
+                                            v-bind:true-value = 'order.send'
+                                            v-bind:false-value = 'order.notSend'
+                                            v-model="order.gift"
+                                        />
+                                        <label for="gift">Ship As Gift?</label>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div>
+                                            <input 
+                                                id='home'
+                                                type="radio"
+                                                value="Home"
+                                                v-model='order.method'
+                                            />  
+                                            <label for="home">Home</label>
+                                        </div>
+                                        <div>
+                                            <input 
+                                                id='business'
+                                                type="radio"
+                                                value="Business"
+                                                v-model='order.method'
+                                            />  
+                                            <label for="business">Business</label>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <div class="col-md-12">
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-primary" type="submit" v-on:click="handleSubmit">Place Order</button>
+                                          </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br/>
+                        <pre>
+                            first Name : {{order.firstname}}
+                            Last Name :  {{order.lastname}}
+                            Gift : {{order.gift}}
+                            Method : {{order.method}},
+                            state :{{order.state}},
+                            zip:{{order.zip}}
+                        </pre>
+                    </div>
+            </div>
+            </main>
+        </div>
+        <script type="text/javascript">
+            var APP_LOG_LIFECYCLE_EVENTS = true
+            var webstore = new Vue ({
+                el: '#app',
+                data:{
+                    sitename:'React is nicer than Vue',
+                    products: [],
+                    cart:[],
+                    showProduct:true,
+                    order:{
+                        firstname:"",
+                        lastname:"",
+                        gift:false,
+                        send:'Send as gift',
+                        notSend:"Don't send as gift",
+                        method:"Home",
+                        state:"",
+                        zip:""
+                    },
+                    states: {
+                        AL: 'Alabama',
+                        AR: 'Arizona',
+                        CA: 'California'
+                        },
+                },
+                filters:{
+                    formatPrice: function(price){
+                        if(!parseInt(price)){
+                            return "";
+                        }
+                        if(price > 99999){
+                            var priceString  = (price/100).toFixed(2);
+                            var priceArray = priceString.split("").reverse();
+                            var index =3;
+                            while (priceArray.length > index +3){
+                                priceArray.splice(index+3 ,0,",");
+                                index +=4;
+                            }
+                            return "$" + priceArray.reverse().join("");
+                        }
+                        else{
+                            return "$" + (price/100).toFixed(2)
+                        }
+                    }
+                },
+                methods:{
+                    addToCart: function(myProduct){
+                        this.cart.push(myProduct);
+                        console.log(this.cart)
+                    },
+                    showCheckout: function(){
+                        this.showProduct = this.showProduct? false:true;
+                    },
+                    handleSubmit: function(){
+                        alert('Submitted')
+                    },
+                    checkRating: function(n, myProduct){
+                        return myProduct.rating -n >= 0
+                    },
+                    canAddToCart: function(myProduct){
+                        let cartProduct = this.cart.filter(item=>item.id === myProduct.id)
+                        console.log(cartProduct.length);
+                        return myProduct.in_stock > cartProduct.length
+                    }
+                },
+                computed:{
+                    cartItemCount: function(){
+                        return this.cart.length || 0
+                    }
+                    },
+                beforeCreate: function(){
+                    if (APP_LOG_LIFECYCLE_EVENTS){
+                        console.log('beforeCreated')
+                    }
+                },
+                created: function(){
+                    axios.get('./products.json')
+                        .then(response=>{
+                            console.log(response.data)
+                            this.products = response.data.products
+                        })
+                },
+                beforeMount:function(){
+                    if(APP_LOG_LIFECYCLE_EVENTS){
+                        console.log('beforeMount')
+                    }
+                },
+                mounted: function(){
+                    if(APP_LOG_LIFECYCLE_EVENTS){
+                        console.log('mounted')
+                    }
+                },
+                beforeUpdate: function(){
+                    if(APP_LOG_LIFECYCLE_EVENTS){
+                        console.log('beforeUpdate')
+                    }
+                },
+                updated: function(){
+                    if(APP_LOG_LIFECYCLE_EVENTS){
+                        console.log('updated')
+                    }
+                },
+                beforeDestroy: function(){
+                    if(APP_LOG_LIFECYCLE_EVENTS){
+                        console.log('beforeDestroy')
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>
+
+<!-- Vue life cycle
+1. Instance creation
+2.Template and virtual DOM creation
+3.Event Loop - Observes changes in the  view-model data. when there is a
+    change the virtual-dom rerenders and patches it into the HTML DOM
+4. Instance destruction -->

@@ -1,0 +1,43 @@
+header h1{
+    padding: 10px 20px;
+}
+header{
+    background-color:aliceblue;
+}
+.cart {
+  padding: 20px 50px;
+}
+.boxes {
+  margin-top: 20px;
+}
+
+.verify {
+  margin-top: 20px;
+}
+
+.submit {
+  margin-top:20px;
+  float: right;
+}
+
+.pagecheckout {
+  padding: 20px 50px;
+}
+.description {
+  font-size: 150%;
+  margin-top:50px;
+}
+.image{
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+}
+
+main{
+    margin-top: 20px;
+}
+
+.active-rating{
+    font-weight: 600;
+    font-size: 30px;
+}
